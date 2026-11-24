@@ -1,0 +1,1 @@
+INSERT INTO Users(ID, NAME) VALUES (99, 'Yassin');
