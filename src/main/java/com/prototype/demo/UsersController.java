@@ -2,7 +2,9 @@ package com.prototype.demo;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
@@ -35,10 +37,19 @@ class UsersController {
          .build(); // finish it and return it
     };
     
-    // used post methode
+    //It handles the POST request
     @PostMapping
-    private ResponseEntity<Void> createNewData(){
-     return null ;
+    private ResponseEntity<Void> createNewData(@RequestBody User newUserRequest, UriComponentsBuilder ucb){
+      User savedUser = usersRepository.save(newUserRequest);
+
+      URI locationOfNewdata = ucb
+      .path("users/{id}")
+      .buildAndExpand(savedUser.id())
+      .toUri();
+
+      return ResponseEntity.created(locationOfNewdata).build();
     }
+
+    
     
 }

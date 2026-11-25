@@ -1,6 +1,9 @@
 package com.prototype.demo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.net.URI;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -36,12 +39,24 @@ import com.jayway.jsonpath.JsonPath;
 
 	@Test
 	void shouldReturnNewUser(){
-		// create new object called NewUser type User
+		// 1 - create new object called NewUser type User
 		// why ID is NUll ? because the server will create it
         User NewUser = new User(null, "Yassin");
+		// 2 - send data to body
+        // postForEntity (url, body, responseType) sends newCashCard as JSON in a POST request
+	    ResponseEntity<Void> creatResponse = restTemplate.postForEntity("/users", NewUser, Void.class);
+        // 3 - now we need to check if data created 
+		assertThat(creatResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-	    ResponseEntity<Void> creaResponse = restTemplate.postForEntity("/users", NewUser, void.class);
+		// 4 - Get the Location header and fetch the new card
+        //createResponse is the ResponseEntity<Void> you got back from postForEntity.
+        //getHeaders() returns all the HTTP headers of that response.
+        //getLocation() picks out the Location header and converts it to a URI object
+		 URI LocationOfNewUser = creatResponse.getHeaders().getLocation();
+         // get the respone as a string because when used json
+		 ResponseEntity<String> response = restTemplate.getForEntity(LocationOfNewUser, String.class);
 
+		 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
        
 		
